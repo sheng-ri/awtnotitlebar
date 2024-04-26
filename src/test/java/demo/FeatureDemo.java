@@ -12,7 +12,7 @@ public class FeatureDemo {
         frame.setVisible(true);
 
         try {
-            NoTitleBar.removeInWindows(frame);
+            NoTitleBar.removeIn(frame);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }

@@ -3,7 +3,7 @@ package top.birthcat.awtnotitlebar;
 import sun.awt.windows.WToolkit;
 import sun.awt.windows.WWindowPeer;
 import top.birthcat.awtnotitlebar.internal.HitTestHelper;
-
+import javax.naming.OperationNotSupportedException;
 import java.awt.*;
 import java.lang.foreign.MemorySegment;
 import java.lang.invoke.MethodHandles;
@@ -19,8 +19,26 @@ public class NoTitleBar {
     /*
     This method will make window invisible and minimized.
      */
-    public static void removeInWindows(Frame frame) {
-        if (!System.getProperty("os.name").contains("Windows")) return;
+    @SuppressWarnings("unused")
+    public static boolean TryRemoveIn(Frame frame) {
+        if (!System.getProperty("os.name").contains("Windows")) return false;
+
+        try {
+            removeIn(frame);
+            return true;
+        } catch (Throwable e) {
+            return false;
+        }
+    }
+
+    /*
+    This method will make window invisible and minimized.
+     */
+    @SuppressWarnings("unused")
+    public static void removeIn(Frame frame) throws Throwable {
+        if (!System.getProperty("os.name").contains("Windows")) {
+            throw new OperationNotSupportedException("This can't call in non windows system.");
+        }
 
         final var visible = frame.isVisible();
         // prevent hWnd is null.
@@ -41,10 +59,6 @@ public class NoTitleBar {
 
             // Update window.
             SetWindowPos.invoke(hWnd, 0, 0, 0, 0, 0, FRESH_FLAGS);
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
         } finally {
             // reset the state
             frame.setVisible(visible);
