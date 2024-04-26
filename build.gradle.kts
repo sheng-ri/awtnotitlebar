@@ -6,7 +6,10 @@ plugins {
 group = "top.birthcat"
 version = "1.0.0"
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+    withSourcesJar()
+}
 
 val commonJvmArgs = listOf(
     "--enable-preview",
@@ -21,10 +24,12 @@ tasks.withType<JavaCompile> {
 }
 
 tasks.withType<JavaExec> {
-    jvmArguments.addAll(commonJvmArgs + runtimeJvmArgs)
+    jvmArgs(commonJvmArgs + runtimeJvmArgs)
 }
 
-publishing.publications.register<MavenPublication>("local")
+publishing.publications.register<MavenPublication>("local") {
+    from(components["java"])
+}
 
 repositories {
     mavenCentral()

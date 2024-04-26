@@ -23,9 +23,6 @@ public class WindowsCall {
     public static final MemoryLayout MARGIN = MemoryLayout.structLayout(
             INT, INT, INT, INT
     );
-    public static final MemoryLayout RECT = MemoryLayout.structLayout(
-            INT, INT, INT, INT
-    );
     public static final MemorySegment LRESULT = toLongPtr(0);
 
     static {

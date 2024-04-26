@@ -1,9 +1,9 @@
 package top.birthcat.awtnotitlebar.internal;
 
+import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
 
 import static top.birthcat.awtnotitlebar.internal.CUtils.*;
-import static top.birthcat.awtnotitlebar.internal.WindowsCall.*;
 
 @SuppressWarnings("preview")
 public final class HitTestHelper {
@@ -36,7 +36,10 @@ public final class HitTestHelper {
     private static final int LeftWidth = 6;
     private static final int RightWidth = 6;
 
-    public static final MemorySegment rectPtr = ARENA.allocate(RECT);
+    public static final MemoryLayout RECT = MemoryLayout.structLayout(
+            INT, INT, INT, INT
+    );
+    public static final MemorySegment RECTPTR = ARENA.allocate(RECT);
 
     public record Rect(int left, int top, int right, int bottom) {
     }
@@ -44,19 +47,7 @@ public final class HitTestHelper {
     public record Point(int x, int y) {
     }
 
-    public static MemorySegment hitTest(long hWnd, MemorySegment lParam) throws Throwable {
-        var point = new Point((int) (lParam.address() & 0xffff), (int) (lParam.address() >> 16 & 0xffff));
-        GetWindowRect.invoke(hWnd, rectPtr);
-        return _hitTest(
-                new Rect(rectPtr.getAtIndex(INT, 0),
-                        rectPtr.getAtIndex(INT, 1),
-                        rectPtr.getAtIndex(INT, 2),
-                        rectPtr.getAtIndex(INT, 3)),
-                point
-        );
-    }
-
-    private static MemorySegment _hitTest(Rect rcWindow, Point ptMouse) {
+    public static MemorySegment _hitTest(Rect rcWindow, Point ptMouse) {
         // Determine if the hit test is for resizing. Default middle (1,1).
         int uRow = 1;
         int uCol = 1;

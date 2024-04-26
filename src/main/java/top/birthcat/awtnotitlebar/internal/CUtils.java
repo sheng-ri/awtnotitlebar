@@ -9,7 +9,7 @@ public final class CUtils {
     private CUtils() {
     }
 
-    public static final Arena ARENA = Arena.global();
+    public static final Arena ARENA = Arena.ofAuto();
     public static final Linker LINKER = Linker.nativeLinker();
 
     public static final ValueLayout.OfInt INT = ValueLayout.JAVA_INT;
