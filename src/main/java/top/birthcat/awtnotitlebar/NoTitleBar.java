@@ -119,6 +119,10 @@ public class NoTitleBar {
             return (MemorySegment) switch (uMsg) {
                 /* Ignore WM_NCCALCSIZE */
                 case WM_NCCALCSIZE -> LRESULT;
+                /*
+                    AWT need custom HITTEST
+                    But Compose Desktop don't need it.
+                */
                 case WM_NCHITTEST -> {
                     var point = new HitTestHelper.Point((int) (lParam.address() & 0xffff), (int) (lParam.address() >> 16 & 0xffff));
                     GetWindowRect.invoke(hWnd, RECTPTR);
