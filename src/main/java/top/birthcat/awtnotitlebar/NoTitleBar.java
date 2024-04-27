@@ -7,8 +7,10 @@ import top.birthcat.awtnotitlebar.internal.HitTestHelper;
 import javax.naming.OperationNotSupportedException;
 import java.awt.*;
 import java.lang.foreign.MemorySegment;
+import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import java.lang.invoke.WrongMethodTypeException;
 
 import static top.birthcat.awtnotitlebar.internal.CUtils.*;
 import static top.birthcat.awtnotitlebar.internal.HitTestHelper.RECTPTR;
@@ -19,9 +21,20 @@ import static top.birthcat.awtnotitlebar.internal.WindowsConstant.*;
 @SuppressWarnings("preview")
 public class NoTitleBar {
 
-    private static final MethodType JAVA_WND_PROC_TYPE = MethodType.methodType(MemorySegment.class, long.class, int.class, MemorySegment.class, MemorySegment.class);
-    /* Prepare for wrapper JavaWndPorc */
-    public static Class<?> wndProcClass = NoTitleBar.class;
+    public static final MethodType JAVA_WND_PROC_TYPE = MethodType.methodType(
+            MemorySegment.class, long.class, int.class, MemorySegment.class, MemorySegment.class
+    );
+    private static MethodHandle WndProcMethod;
+
+    /*
+    You muse call NoTitleBar::javaWndProc to handle the other message.
+     */
+    public static void setWndProcMethod(MethodHandle wndProcMethod) {
+        if (!wndProcMethod.type().equals(JAVA_WND_PROC_TYPE)) {
+            throw new WrongMethodTypeException(STR."Your type: \{wndProcMethod.type()}, Except type: \{JAVA_WND_PROC_TYPE}");
+        }
+        WndProcMethod = wndProcMethod;
+    }
 
     /*
     This method will make window invisible and minimized.
@@ -78,7 +91,7 @@ public class NoTitleBar {
 
     private static void extendNonClientArea(long hWnd) throws Throwable {
         final var margin = ARENA.allocate(MARGIN);
-        margin.set(INT,0,1);
+        margin.set(INT, 0, -1);
         DwmExtendFrameIntoClientArea.invoke(hWnd, margin);
     }
 
@@ -88,7 +101,8 @@ public class NoTitleBar {
 
         originWndProcAddress = (MemorySegment) GetWindowLongA.invoke(hWnd, GWL_WNDPROC);
 
-        final var javaWndProc = MethodHandles.lookup().findStatic(wndProcClass, "javaWndProc", JAVA_WND_PROC_TYPE);
+        final var javaWndProc = WndProcMethod != null ? WndProcMethod
+                : MethodHandles.lookup().findStatic(NoTitleBar.class, "javaWndProc", JAVA_WND_PROC_TYPE);
         final var wndProcPtr = LINKER.upcallStub(javaWndProc, WndProc, ARENA);
         SetWindowLongA.invoke(hWnd, GWL_WNDPROC, wndProcPtr);
     }
