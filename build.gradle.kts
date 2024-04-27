@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "top.birthcat"
-version = "1.0.0"
+version = "1.0.1"
 
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(21)
@@ -30,6 +30,7 @@ tasks.withType<JavaExec> {
 }
 
 publishing.publications.register<MavenPublication>("local") {
+    artifactId = artifactId.lowercase()
     from(components["java"])
 }
 

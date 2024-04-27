@@ -16,11 +16,12 @@ NoTitleBar::removeIn
 NoTitleBar::tryRemoveIn
 ```
 #### Compose Desktop
-You need set
+Same as below, and apply this
 ```kotlin
 Window(undecorated = true)
 ```
-then everything same as AWT.
+But with awt impl the window border will blink.
+You need use `NoTitleBar::workWithCompose`
 ### Unknown behavior
 * Minimize
 * Maximize
