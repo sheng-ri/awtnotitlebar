@@ -11,10 +11,12 @@ java {
     withSourcesJar()
 }
 
+
 val commonJvmArgs = listOf(
     "--enable-preview",
-    "--add-exports","java.desktop/sun.awt.windows=ALL-UNNAMED",
+    "--add-exports=java.desktop/sun.awt.windows=ALL-UNNAMED",
 )
+
 val runtimeJvmArgs = listOf(
     "--enable-native-access=ALL-UNNAMED"
 )

@@ -1,4 +1,4 @@
-package top.birthcat.awtnotitlebar.internal;
+package top.birthcat.notitlebar;
 
 import java.lang.foreign.*;
 

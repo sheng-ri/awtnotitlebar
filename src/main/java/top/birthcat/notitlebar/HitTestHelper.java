@@ -1,9 +1,9 @@
-package top.birthcat.awtnotitlebar.internal;
+package top.birthcat.notitlebar;
 
 import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
 
-import static top.birthcat.awtnotitlebar.internal.CUtils.*;
+import static top.birthcat.notitlebar.CUtils.*;
 
 @SuppressWarnings("preview")
 public final class HitTestHelper {
@@ -11,12 +11,13 @@ public final class HitTestHelper {
     private HitTestHelper() {
     }
 
+    public static final MemorySegment HTNOWHERE = toLongPtr(0);
+
     private static final MemorySegment HTTOP = toLongPtr(12);
     private static final MemorySegment HTTOPLEFT = toLongPtr(13);
     private static final MemorySegment HTTOPRIGHT = toLongPtr(14);
 
     private static final MemorySegment HTLEFT = toLongPtr(10);
-    private static final MemorySegment HTNOWHERE = toLongPtr(0);
     private static final MemorySegment HTRIGHT = toLongPtr(11);
 
 

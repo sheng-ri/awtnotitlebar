@@ -1,6 +1,8 @@
-package top.birthcat.awtnotitlebar.internal;
+package top.birthcat.notitlebar;
 
-public class WindowsConstant {
+public final class WindowsConstant {
+
+    private WindowsConstant() {}
 
     public static final int SWP_NOMOVE = 0x0002;
     public static final int SWP_NOSIZE = 0x0001;

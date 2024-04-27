@@ -1,10 +1,8 @@
-package top.birthcat.awtnotitlebar;
+package top.birthcat.notitlebar;
 
 import sun.awt.windows.WToolkit;
 import sun.awt.windows.WWindowPeer;
-import top.birthcat.awtnotitlebar.internal.HitTestHelper;
 
-import javax.naming.OperationNotSupportedException;
 import java.awt.*;
 import java.lang.foreign.MemorySegment;
 import java.lang.invoke.MethodHandle;
@@ -12,14 +10,15 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.invoke.WrongMethodTypeException;
 
-import static top.birthcat.awtnotitlebar.internal.CUtils.*;
-import static top.birthcat.awtnotitlebar.internal.HitTestHelper.RECTPTR;
-import static top.birthcat.awtnotitlebar.internal.HitTestHelper._hitTest;
-import static top.birthcat.awtnotitlebar.internal.WindowsCall.*;
-import static top.birthcat.awtnotitlebar.internal.WindowsConstant.*;
+import static top.birthcat.notitlebar.CUtils.*;
+import static top.birthcat.notitlebar.HitTestHelper.*;
+import static top.birthcat.notitlebar.WindowsCall.*;
+import static top.birthcat.notitlebar.WindowsConstant.*;
 
 @SuppressWarnings("preview")
-public class NoTitleBar {
+public final class NoTitleBar {
+
+    private NoTitleBar() {}
 
     public static final MethodType JAVA_WND_PROC_TYPE = MethodType.methodType(
             MemorySegment.class, long.class, int.class, MemorySegment.class, MemorySegment.class
@@ -28,7 +27,7 @@ public class NoTitleBar {
     private static MethodHandle WndProcMethod;
 
     /*
-    You muse call NoTitleBar::javaWndProc to handle the other message.
+        You muse call NoTitleBar::javaWndProc to handle the other message.
      */
     public static void setWndProcMethod(MethodHandle wndProcMethod) {
         if (!wndProcMethod.type().equals(JAVA_WND_PROC_TYPE)) {
@@ -38,7 +37,19 @@ public class NoTitleBar {
     }
 
     /*
-    This method will make window invisible and minimized.
+        Using default NoTitleBar::composeJavaWndProc to handle the message.
+     */
+    public static void workWithCompose() {
+        try {
+            WndProcMethod = MethodHandles.lookup()
+                    .findStatic(NoTitleBar.class,"composeJavaWndProc",JAVA_WND_PROC_TYPE);
+        } catch (NoSuchMethodException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /*
+        This method will make window invisible and minimized.
      */
     @SuppressWarnings("unused")
     public static boolean tryRemoveIn(Frame frame) {
@@ -55,9 +66,9 @@ public class NoTitleBar {
     /*
        This method will make window invisible and minimized.
     */
-    public static void removeIn(Frame frame) throws Throwable {
+    public static void removeIn(Frame frame) {
         if (!System.getProperty("os.name").contains("Windows")) {
-            throw new OperationNotSupportedException("This can't call in non windows system.");
+            throw new UnsupportedOperationException("This can't call in non windows system.");
         }
 
         try {
@@ -68,7 +79,7 @@ public class NoTitleBar {
             final var state = frame.getState();
             // prevent user see the window change.
             // use minimized icon will show in taskbar.
-            frame.setState(Frame.ICONIFIED);
+            frame.setExtendedState(Frame.ICONIFIED);
 
             // Get hWnd.
             final var peer = (WWindowPeer) WToolkit.targetToPeer(frame);
@@ -92,7 +103,7 @@ public class NoTitleBar {
     }
 
     private static void setStyleWithCaption(long hWnd) throws Throwable {
-        final var style = (MemorySegment)GetWindowLongA.invoke(hWnd, GWL_STYLE);
+        final var style = (MemorySegment) GetWindowLongA.invoke(hWnd, GWL_STYLE);
         SetWindowLongA.invoke(hWnd, GWL_STYLE, toLongPtr(style.address() | WS_CAPTION));
     }
 
@@ -114,6 +125,22 @@ public class NoTitleBar {
         SetWindowLongA.invoke(hWnd, GWL_WNDPROC, wndProcPtr);
     }
 
+    public static MemorySegment composeJavaWndProc(long hWnd, int uMsg, MemorySegment wParam, MemorySegment lParam) {
+        try {
+
+            if (uMsg == WM_NCCALCSIZE) {
+                return LRESULT;
+            } else {
+                return (MemorySegment) CallWindowProcA.invoke(originWndProcAddress, hWnd, uMsg, wParam, lParam);
+            }
+
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static MemorySegment javaWndProc(long hWnd, int uMsg, MemorySegment wParam, MemorySegment lParam) {
         try {
             return (MemorySegment) switch (uMsg) {
@@ -126,13 +153,16 @@ public class NoTitleBar {
                 case WM_NCHITTEST -> {
                     var point = new HitTestHelper.Point((int) (lParam.address() & 0xffff), (int) (lParam.address() >> 16 & 0xffff));
                     GetWindowRect.invoke(hWnd, RECTPTR);
-                    yield _hitTest(
+                    var hitRst = _hitTest(
                             new HitTestHelper.Rect(RECTPTR.getAtIndex(INT, 0),
                                     RECTPTR.getAtIndex(INT, 1),
                                     RECTPTR.getAtIndex(INT, 2),
                                     RECTPTR.getAtIndex(INT, 3)),
                             point
                     );
+                    if (hitRst == HTNOWHERE) {
+                        yield CallWindowProcA.invoke(originWndProcAddress, hWnd, uMsg, wParam, lParam);
+                    } else yield hitRst;
                 }
                 default -> CallWindowProcA.invoke(originWndProcAddress, hWnd, uMsg, wParam, lParam);
             };

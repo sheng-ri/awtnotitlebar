@@ -10,7 +10,7 @@ or in one line.
 --add-exports java.desktop/sun.awt.windows=ALL-UNNAMED --enable-native-access=ALL-UNNAMED --enable-preview
 ```
 #### AWT/Swing
-See `top.birthcat.awtnotitlebar.NoTitleBar`
+See `top.birthcat.notitlebar.NoTitleBar`
 ```
 NoTitleBar::removeIn
 NoTitleBar::tryRemoveIn

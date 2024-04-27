@@ -1,4 +1,4 @@
-package top.birthcat.awtnotitlebar.internal;
+package top.birthcat.notitlebar;
 
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.MemoryLayout;
@@ -6,11 +6,12 @@ import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SymbolLookup;
 import java.lang.invoke.MethodHandle;
 
-import static top.birthcat.awtnotitlebar.internal.CUtils.*;
+import static top.birthcat.notitlebar.CUtils.*;
 
 @SuppressWarnings({"preview", "OptionalGetWithoutIsPresent"})
-public class WindowsCall {
+public final class WindowsCall {
 
+    private WindowsCall() {}
 
     public static final MethodHandle SetWindowLongA;
     public static final MethodHandle GetWindowLongA;
