@@ -1,6 +1,7 @@
 package demo;
 
 import top.birthcat.notitlebar.NoTitleBar;
+import top.birthcat.notitlebar.Solution;
 
 import javax.swing.*;
 import java.awt.*;
@@ -42,7 +43,7 @@ public class FeatureDemo {
         frame.setVisible(true);
 
         try {
-            NoTitleBar.setWndProcMethod(MethodHandles.lookup()
+            Solution.setWndProcMethod(MethodHandles.lookup()
                     .findStatic(FeatureDemo.class, "javaWndProc", JAVA_WND_PROC_TYPE));
             NoTitleBar.removeIn(frame);
         } catch (Throwable e) {
@@ -54,6 +55,6 @@ public class FeatureDemo {
         switch (uMsg) {
             case WM_NCCALCSIZE -> System.out.println("CalcSize.");
         }
-        return NoTitleBar.javaWndProc(hWnd, uMsg, wParam, lParam);
+        return Solution.javaWndProc(hWnd, uMsg, wParam, lParam);
     }
 }
