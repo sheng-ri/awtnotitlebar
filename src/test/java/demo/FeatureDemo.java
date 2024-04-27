@@ -4,7 +4,6 @@ import top.birthcat.awtnotitlebar.NoTitleBar;
 
 import javax.swing.*;
 import java.lang.foreign.MemorySegment;
-import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 
 import static top.birthcat.awtnotitlebar.NoTitleBar.JAVA_WND_PROC_TYPE;

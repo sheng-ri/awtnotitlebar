@@ -24,6 +24,7 @@ public class NoTitleBar {
     public static final MethodType JAVA_WND_PROC_TYPE = MethodType.methodType(
             MemorySegment.class, long.class, int.class, MemorySegment.class, MemorySegment.class
     );
+
     private static MethodHandle WndProcMethod;
 
     /*
@@ -75,6 +76,7 @@ public class NoTitleBar {
 
             replaceWndProc(hWnd);
             extendNonClientArea(hWnd);
+            setStyleWithCaption(hWnd);
 
             // Update window.
             SetWindowPos.invoke(hWnd, 0, 0, 0, 0, 0, FRESH_FLAGS);
@@ -89,9 +91,14 @@ public class NoTitleBar {
         }
     }
 
+    private static void setStyleWithCaption(long hWnd) throws Throwable {
+        final var style = (MemorySegment)GetWindowLongA.invoke(hWnd, GWL_STYLE);
+        SetWindowLongA.invoke(hWnd, GWL_STYLE, toLongPtr(style.address() | WS_CAPTION));
+    }
+
     private static void extendNonClientArea(long hWnd) throws Throwable {
         final var margin = ARENA.allocate(MARGIN);
-        margin.set(INT, 0, -1);
+        margin.set(INT, 0, 1);
         DwmExtendFrameIntoClientArea.invoke(hWnd, margin);
     }
 
