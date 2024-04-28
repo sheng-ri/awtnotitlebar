@@ -9,7 +9,10 @@ public final class CUtils {
     private CUtils() {
     }
 
-    public static final Arena ARENA = Arena.ofAuto();
+    /*
+        Allocate as static field(live with app)
+     */
+    public static final Arena ARENA = Arena.ofShared();
     public static final Linker LINKER = Linker.nativeLinker();
 
     public static final ValueLayout.OfInt INT = ValueLayout.JAVA_INT;

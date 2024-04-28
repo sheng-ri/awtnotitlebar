@@ -16,6 +16,7 @@ public final class WindowsCall {
     public static final MethodHandle SetWindowLongA;
     public static final MethodHandle GetWindowLongA;
     public static final MethodHandle CallWindowProcA;
+    public static final MethodHandle DefWindowProcA;
     public static final MethodHandle GetWindowRect;
     public static final MethodHandle DwmExtendFrameIntoClientArea;
     public static final MethodHandle SetWindowPos;
@@ -52,6 +53,12 @@ public final class WindowsCall {
                 user32.find("CallWindowProcA").get(),
                 FunctionDescriptor.of(
                         LONG_PTR, LONG_PTR, LONG, INT, INT_PTR, LONG_PTR)
+        );
+        DefWindowProcA = LINKER.downcallHandle(
+                user32.find("DefWindowProcA").get(),
+                FunctionDescriptor.of(
+                        LONG_PTR,LONG,INT,INT_PTR,LONG_PTR
+                )
         );
         GetWindowRect = LINKER.downcallHandle(
                 user32.find("GetWindowRect").get(),

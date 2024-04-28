@@ -20,8 +20,8 @@ Same as below, and apply this
 ```kotlin
 Window(undecorated = true)
 ```
-But with awt impl the window border will blink.
-You need use `NoTitleBar::workWithCompose`
+~~But with awt impl the window border will blink when mouse over the button.
+You need use `NoTitleBar::workWithCompose`~~
 ### Unknown behavior
 * Minimize
 * Maximize

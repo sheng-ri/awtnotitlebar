@@ -11,7 +11,7 @@ public final class HitTestHelper {
     private HitTestHelper() {
     }
 
-    public static final MemorySegment HTNOWHERE = toLongPtr(0);
+    public static final MemorySegment HTCLIENT = toLongPtr(1);
 
     private static final MemorySegment HTTOP = toLongPtr(12);
     private static final MemorySegment HTTOPLEFT = toLongPtr(13);
@@ -28,7 +28,7 @@ public final class HitTestHelper {
 
     private static final MemorySegment[][] hitTests = new MemorySegment[][]{
             new MemorySegment[]{HTTOPLEFT, HTTOP, HTTOPRIGHT},
-            new MemorySegment[]{HTLEFT, HTNOWHERE, HTRIGHT},
+            new MemorySegment[]{HTLEFT, HTCLIENT, HTRIGHT},
             new MemorySegment[]{HTBOTTOMLEFT, HTBOTTOM, HTBOTTOMRIGHT},
     };
 

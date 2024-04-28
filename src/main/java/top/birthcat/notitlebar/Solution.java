@@ -13,8 +13,10 @@ import static top.birthcat.notitlebar.WindowsCall.*;
 import static top.birthcat.notitlebar.WindowsCall.CallWindowProcA;
 import static top.birthcat.notitlebar.WindowsConstant.*;
 
+@SuppressWarnings("preview")
 public final class Solution {
-    private Solution() {}
+    private Solution() {
+    }
 
     private static MethodHandle WndProcMethod;
 
@@ -60,17 +62,7 @@ public final class Solution {
             return (MemorySegment) switch (uMsg) {
                 /* Ignore WM_NCCALCSIZE */
                 case WM_NCCALCSIZE -> LRESULT;
-                case WM_NCHITTEST -> {
-                    var point = new HitTestHelper.Point((int) (lParam.address() & 0xffff), (int) (lParam.address() >> 16 & 0xffff));
-                    GetWindowRect.invoke(hWnd, RECTPTR);
-                    yield _hitTest(
-                            new HitTestHelper.Rect(RECTPTR.getAtIndex(INT, 0),
-                                    RECTPTR.getAtIndex(INT, 1),
-                                    RECTPTR.getAtIndex(INT, 2),
-                                    RECTPTR.getAtIndex(INT, 3)),
-                            point
-                    );
-                }
+                case WM_NCHITTEST -> DefWindowProcA.invoke(hWnd, uMsg, wParam, lParam);
                 default -> CallWindowProcA.invoke(originWndProcAddress, hWnd, uMsg, wParam, lParam);
             };
         } catch (RuntimeException e) {
@@ -85,9 +77,7 @@ public final class Solution {
             return (MemorySegment) switch (uMsg) {
                 /* Ignore WM_NCCALCSIZE */
                 case WM_NCCALCSIZE -> LRESULT;
-                /*
-                    AWT need custom HITTEST
-                */
+                /* AWT need custom HITTEST */
                 case WM_NCHITTEST -> {
                     var point = new HitTestHelper.Point((int) (lParam.address() & 0xffff), (int) (lParam.address() >> 16 & 0xffff));
                     GetWindowRect.invoke(hWnd, RECTPTR);
@@ -98,7 +88,7 @@ public final class Solution {
                                     RECTPTR.getAtIndex(INT, 3)),
                             point
                     );
-                    if (hitRst == HTNOWHERE) {
+                    if (hitRst == HTCLIENT) {
                         yield CallWindowProcA.invoke(originWndProcAddress, hWnd, uMsg, wParam, lParam);
                     } else yield hitRst;
                 }
