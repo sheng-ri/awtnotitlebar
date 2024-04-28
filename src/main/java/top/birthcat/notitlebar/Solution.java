@@ -55,7 +55,7 @@ public final class Solution {
     }
 
     /*
-        Forward HIT_TEST will make compose window border flink.
+        fast path for compose
      */
     public static MemorySegment composeJavaWndProc(long hWnd, int uMsg, MemorySegment wParam, MemorySegment lParam) {
         try {

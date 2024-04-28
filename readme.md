@@ -20,10 +20,11 @@ Same as below, and apply this
 ```kotlin
 Window(undecorated = true)
 ```
-~~But with awt impl the window border will blink when mouse over the button.
-You need use `NoTitleBar::workWithCompose`~~
-### Unknown behavior
-* Minimize
-* Maximize
+`NoTitleBar::workWithCompose` for a fast path for compose
+### Strange behavior
+* Resize window to 0px
+
+In my pc,window border blink when mouse over Button or user input to TextField.  
+But when I test in other pc,this problem can't reproduce.
 ### Build
 Java 21 + Gradle
